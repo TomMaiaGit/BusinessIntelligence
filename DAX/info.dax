@@ -1,0 +1,66 @@
+//Site para executar os código
+
+// https://dax.do/
+
+//Retorna uma operação na tabela:
+EVALUATE 
+    CALCULATETABLE (       --Para retornar uma tabela filtrada
+     Product,              --Escolha da Tabela
+    'Product'[Unit Price] > 120    --Filtro direto
+    )
+----------------------------------------
+//Retorna uma operação em uma tabela:
+EVALUATE
+    CALCULATETABLE (                --Para retornar uma tabela filtrada
+    Product,                        --Escolha da Tabela     
+        FILTER (                    --Filtro indireto
+        Product, 
+        'Product'[Unit Price] > 120
+        ) 
+    ) 
+----------------------------------------
+EVALUATE
+   SELECTCOLUMNS (                  --Retonar um ou mais colunas de uma tabela
+    product ,                       --Escolha da tabela
+    "Nome produto" ,'Product'[Product Name],    --Nome criado para o resulktado da coluna
+    "Preço Unitário" ,'Product'[Unit Price]     --Nome criado para o resulktado da coluna
+    )
+----------------------------------------
+EVALUATE 
+CALCULATETABLE (                    --Retonar um colunas de uma tabela
+    product,                        --Escolha da tabela - pode ser somente a tabela se não quiser ter filtros
+    CONTAINSSTRING ('Product'[Product Name] , "M150")  --Equivalente ao LIKE do Sql, retonar as linhas que contem a string
+)
+----------------------------------------
+EVALUATE 
+SUMMARIZECOLUMNS (
+    'Product'[Product Name],  -- O nome descritivo do produto
+    Sales[Unit Price]         -- O valor unitário do produto ESPECÍFICO naquela linha da venda
+ 
+)
+----------------------------------------
+EVALUATE 
+SUMMARIZECOLUMNS (       --Cria tabela agrupada
+    'Product'[Category], --Agrega a categoria do produto
+    'Date'[Fiscal Year], --Agrega o ano fiscal
+    "Total vendido por categoria", SUM( Sales[Unit Price]) --Função para agregar os itens acima, que soma o valor unitario vendido.
+    ) 
+
+EVALUATE 
+SUMMARIZECOLUMNS (          --Cria tabela agrupada
+    'Product'[Product Name], --Item a ser agrupado
+     "Total Vendido", SUM(Sales[Unit Price]) --Função para relacionar a agregação
+  )
+----------------------------------------
+//Retornando as colunas de tabelas distintas com relação de colunas semelhante ao INNER JOIN (SQL)
+EVALUATE 
+SELECTCOLUMNS (
+    Sales,                                                  -- Estamos iterando sobre cada linha da tabela Sales
+    "Número da Venda", Sales[Order Number],
+    "Nome do Produto", RELATED ( 'Product'[Product Name] ), -- Traz o nome do produto da tabela 'Product'
+    "Nome do Cliente", RELATED ( Customer[Name] ),          -- Traz o nome do cliente da tabela 'Customer'
+    "Quantidade Vendida", Sales[Quantity],
+    "Preço Unitário", Sales[Unit Price]
+)
+
+
